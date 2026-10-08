@@ -1,0 +1,47 @@
+{
+  "_comment": [
+    "First sample: reviews only, no photos. Build it with --images illustrative",
+    "to see the generated-placeholder path. Summit Ridge Roofing is a FICTIONAL",
+    "business invented for this demo; its reviews and phone number are made up."
+  ],
+  "name": "Summit Ridge Roofing",
+  "category": "Roofing Contractor",
+  "city": "Asheville, NC",
+  "phone": "(828) 555-0147",
+  "website": "https://summitridgeroofing.example",
+  "hours": "Mon-Fri 7:30am-6pm, Sat 9am-2pm",
+  "country": "US",
+  "offers_free_estimates": false,
+  "reviews": [
+    {
+      "author": "Marcus D.",
+      "rating": 5,
+      "text": "After a bad hailstorm our roof was leaking in two spots. Summit Ridge came out the next morning, walked me through the damage with photos, and worked directly with my insurance. The new shingles look fantastic and the crew cleaned up every last nail. Honest people.",
+      "date": "March 2026"
+    },
+    {
+      "author": "Priya S.",
+      "rating": 5,
+      "text": "They replaced our entire roof in two days. The estimate was clear with no hidden fees, and they finished on budget. Very respectful of our yard and landscaping. Highly recommend for anyone in the Asheville area.",
+      "date": "February 2026"
+    },
+    {
+      "author": "Greg T.",
+      "rating": 4,
+      "text": "Good quality work on a tricky metal roof repair. Showed up on time and the price was fair. Took one extra day because of rain but they kept me updated the whole way.",
+      "date": "January 2026"
+    },
+    {
+      "author": "Danielle W.",
+      "rating": 5,
+      "text": "Called three roofers for quotes and Summit Ridge was the only one who climbed up, took measurements, and explained what actually needed doing versus what could wait. No pressure. We went with them and could not be happier with the gutter and shingle work.",
+      "date": "December 2025"
+    },
+    {
+      "author": "Robert L.",
+      "rating": 4,
+      "text": "Solid crew, did a full tear-off and re-shingle on our 1990s home. Communication was great and they stood behind their workmanship when we had a question about a vent a week later.",
+      "date": "November 2025"
+    }
+  ]
+}

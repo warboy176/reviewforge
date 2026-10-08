@@ -1,0 +1,91 @@
+{
+  "_comment": [
+    "Second sample: the PREFERRED path -- the business supplies its own photos.",
+    "With photos present, ReviewForge uses only those: the first (or role=hero)",
+    "becomes the hero, the rest become the 'Our work' gallery, captions are kept",
+    "verbatim, and no illustrative imagery is generated at all.",
+    "",
+    "Blue Line Plumbing is a FICTIONAL business invented for this demo; its",
+    "reviews, rating summary and phone number are made up (555 numbers, .example",
+    "domain). The photos are openly licensed stand-ins from Wikimedia Commons",
+    "(public domain / CC0), credited in 'attribution' and in the README. They are",
+    "not photographs of this (non-existent) business's work. For a real build,",
+    "point 'src' at the business's own image files."
+  ],
+  "name": "Blue Line Plumbing",
+  "category": "Plumber",
+  "city": "Boise, ID",
+  "phone": "(208) 555-0199",
+  "website": "https://bluelineplumbing.example",
+  "hours": "Mon-Fri 7am-5pm, 24/7 emergency call-out",
+  "country": "US",
+  "offers_free_estimates": false,
+  "rating_summary": {
+    "average": 4.8,
+    "count": 37,
+    "platform": "Google"
+  },
+  "logo": {
+    "src": "photos/logo.png",
+    "alt": "Blue Line Plumbing logo"
+  },
+  "photos": [
+    {
+      "src": "photos/bathroom-rough-in.jpg",
+      "role": "hero",
+      "alt": "Hot and cold supply lines roughed in for a new shower, red and blue tubing on a block wall",
+      "caption": "Shower supply lines roughed in before the walls are finished",
+      "attribution": "Stand-in photo: KVDP, public domain, via Wikimedia Commons"
+    },
+    {
+      "src": "photos/pex-supply-line.jpg",
+      "alt": "Blue PEX supply pipe with a brass shut-off valve run along a basement ceiling",
+      "caption": "New PEX supply line and shut-off valve for an outside tap",
+      "attribution": "Stand-in photo: Tomwsulcer, CC0, via Wikimedia Commons"
+    },
+    {
+      "src": "photos/water-heater.jpg",
+      "alt": "An electric instantaneous water heater with its cover removed, showing copper pipework and wiring",
+      "caption": "Instantaneous water heater opened up for service",
+      "attribution": "Stand-in photo: Mattes, public domain, via Wikimedia Commons"
+    },
+    {
+      "src": "photos/isolating-valve.jpg",
+      "alt": "A 15mm compression-fitting isolating valve with its nut and copper olive laid out",
+      "caption": "Isolating valve, nut and olive ready to fit",
+      "attribution": "Stand-in photo: Mike1024, public domain, via Wikimedia Commons"
+    }
+  ],
+  "reviews": [
+    {
+      "author": "Ana R.",
+      "rating": 5,
+      "text": "Our main line burst at 11pm on a Saturday and Blue Line had someone at the house inside the hour. He shut it down, explained exactly what had failed, and came back Monday to do the repair properly instead of patching it. The quote he gave on the phone is what we paid.",
+      "date": "April 2026"
+    },
+    {
+      "author": "Tom K.",
+      "rating": 5,
+      "text": "Had three quotes for a whole-house repipe. Blue Line was the only one who pulled the panel off and showed me what was actually behind the wall. Clean work, drywall patched better than it was before, and they hauled everything away.",
+      "date": "March 2026"
+    },
+    {
+      "author": "Delia M.",
+      "rating": 4,
+      "text": "Good honest plumbers. Fixed a slow drain that two other companies had just snaked and taken my money for. Took a bit of back-and-forth to get scheduled but once they were here the work was thorough.",
+      "date": "February 2026"
+    },
+    {
+      "author": "Hector V.",
+      "rating": 5,
+      "text": "Replaced our water heater with a tankless unit and sorted out the gas line at the same time. They pulled the permit themselves and handled the inspection. No upselling, just told me what the house needed.",
+      "date": "January 2026"
+    },
+    {
+      "author": "Shauna P.",
+      "rating": 5,
+      "text": "Called about a leaking shower valve. The tech found it was actually a cracked escutcheon and a two dollar part, told me so, and charged me the minimum call-out instead of selling me a new valve. That kind of honesty is why I will call them again.",
+      "date": "December 2025"
+    }
+  ]
+}

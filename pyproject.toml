@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reviewforge"
+version = "0.1.0"
+description = "Turn a local business's own customer reviews into a clean, honest one-page website it owns."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Warboy Open Tools" }]
+keywords = ["reviews", "local-business", "small-business", "static-site-generator", "ollama"]
+dependencies = []  # stdlib only -- no runtime third-party deps
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+
+[project.scripts]
+reviewforge = "reviewforge.cli:main"
+
+[tool.setuptools]
+packages = ["reviewforge"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
