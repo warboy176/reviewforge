@@ -15,6 +15,10 @@ Imagery:
 
     # Never show imagery we cannot attribute to the business:
     reviewforge build -i business.json -o out/ --images own-only
+
+# Optional: receive chat-widget / contact-form leads (stdlib, binds 127.0.0.1).
+reviewforge serve-leads --origin https://www.example-business.example --db leads.sqlite3
+reviewforge serve-leads --db leads.sqlite3 --export-csv leads.csv
 """
 from __future__ import annotations
 
@@ -23,6 +27,7 @@ import json
 import sys
 
 from reviewforge import __version__, images as images_mod, llm
+from reviewforge import receiver as receiver_mod
 from reviewforge.generator import ImageConfig, generate_site_content
 from reviewforge.models import LegalRequirementError
 from reviewforge.renderer import write_site
@@ -39,6 +44,44 @@ def _image_config(args: argparse.Namespace) -> ImageConfig:
         seed=args.image_seed,
         timeout=args.image_timeout,
     )
+
+
+def _cmd_serve_leads(args: argparse.Namespace) -> int:
+    if args.export_csv:
+        store = receiver_mod.LeadStore(args.db)
+        n = store.export_csv(args.export_csv)
+        store.close()
+        print(f"Exported {n} lead(s) to {args.export_csv}")
+        return 0
+
+    if not args.origin:
+        print("error: --origin is required (the site's origin, e.g. https://www.example.com)", file=sys.stderr)
+        return 2
+
+    notify = receiver_mod.smtp_notifier_from_env()
+    if notify:
+        print("Email notification: on (REVIEWFORGE_SMTP_* environment variables)")
+    else:
+        print("Email notification: off (set REVIEWFORGE_SMTP_HOST, _FROM and _TO to enable)")
+
+    cfg = receiver_mod.ReceiverConfig(
+        db_path=args.db,
+        allowed_origins=list(args.origin),
+        path=args.path,
+        max_bytes=args.max_bytes,
+        rate_limit=args.rate_limit,
+        rate_window=args.rate_window,
+        require_consent=args.require_consent,
+        redirect_url=args.redirect,
+        notify=notify
+    )
+
+    if args.host not in ("127.0.0.1", "localhost", "::1"):
+        print(f"WARNING: listening on a non-loopback address {args.host}; "
+              f"this should sit behind a TLS reverse proxy", file=sys.stderr)
+
+    receiver_mod.serve(cfg, host=args.host, port=args.port)
+    return 0
 
 
 def _cmd_build(args: argparse.Namespace) -> int:
@@ -202,6 +245,20 @@ def build_parser() -> argparse.ArgumentParser:
     p_check.add_argument("--endpoint", **common_llm["endpoint"])
     _add_image_args(p_check)
     p_check.set_defaults(func=_cmd_check)
+
+    p_leads = sub.add_parser("serve-leads", help="run the optional lead receiver for the chat widget / contact form")
+    p_leads.add_argument("--db", default="leads.sqlite3", help="SQLite file to store leads in")
+    p_leads.add_argument("--origin", action="append", default=None, help="allowed site origin for CORS, e.g. https://www.example.com (repeatable)")
+    p_leads.add_argument("--host", default="127.0.0.1")
+    p_leads.add_argument("--port", type=int, default=8787)
+    p_leads.add_argument("--path", default="/lead")
+    p_leads.add_argument("--max-bytes", type=int, default=8192)
+    p_leads.add_argument("--rate-limit", type=int, default=5, help="requests per IP per window")
+    p_leads.add_argument("--rate-window", type=float, default=600.0, help="seconds")
+    p_leads.add_argument("--require-consent", action="store_true", help="reject leads without consent (always use for DE / EU sites)")
+    p_leads.add_argument("--redirect", default=None, help="URL to send no-JS form posts to after success")
+    p_leads.add_argument("--export-csv", default=None, metavar="PATH", help="write all stored leads to a CSV file and exit")
+    p_leads.set_defaults(func=_cmd_serve_leads)
 
     return parser
 
