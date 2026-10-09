@@ -1,0 +1,18 @@
+# prepublish scrub allowlist -- each entry is a verified false positive.
+# Format: <path> :: <rule>. Suppressions are echoed in the scrub footer.
+
+# The widget's fetch() call passes the standard option that stops cookies
+# being sent (value "omit"). It is a Fetch API keyword, not a secret.
+reviewforge/assets/chat.js :: secret_assignment
+out-photos/chat.js :: secret_assignment
+
+# Fabricated sample numbers used only to exercise the phone validator
+# (a well-formed international one and a malformed double-prefix one).
+# They are invented, belong to no one, and never leave the test file.
+tests/test_leads.py :: identity_phone
+tests/test_chat_js.py :: identity_phone
+
+# A deliberately invalid sample URL that the loader is asserted to REJECT
+# because it carries inline credentials -- it is the negative test for that
+# very rule, not a real endpoint.
+tests/test_leads.py :: secret_url_basic_auth
