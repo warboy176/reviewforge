@@ -14,6 +14,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
+from reviewforge.leads import BookingConfig, LeadsConfig
+
 # --------------------------------------------------------------------------
 # Image provenance vocabulary
 # --------------------------------------------------------------------------
@@ -257,6 +259,10 @@ class Business:
     #: ISO 3166-1 alpha-2 country code, e.g. "US", "DE".
     country: Optional[str] = None
     legal: LegalInfo = field(default_factory=LegalInfo)
+    #: Optional lead-capture settings for the chat widget (see reviewforge.leads).
+    leads: Optional[LeadsConfig] = None
+    #: Optional third-party booking page (cal.com / Google / Calendly).
+    booking: Optional[BookingConfig] = None
 
     @property
     def rating_average(self) -> Optional[float]:

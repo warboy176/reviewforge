@@ -29,6 +29,7 @@ from reviewforge.models import (
     Review,
     SiteImage,
 )
+from reviewforge.leads import parse_booking, parse_leads
 
 _COUNTRY_ALIASES = {
     "GERMANY": "DE", "DEUTSCHLAND": "DE", "USA": "US",
@@ -196,7 +197,14 @@ def _business_from_dict(data: dict[str, Any]) -> Business:
         rating_summary=_rating_summary(data.get("rating_summary")),
         country=_country(data.get("country")),
         legal=_legal(data.get("legal")),
+        leads=parse_leads(data.get("leads")),
+        booking=parse_booking(data.get("booking")),
     )
+    if business.booking is not None and business.leads is None:
+        raise ValueError(
+            "'booking' needs a 'leads' block too: a booking request is also sent "
+            "to the business as a lead, so it must have somewhere to go."
+        )
     # Fails the load (and therefore the build) for DE without legal pages.
     business.legal_warnings()
     return business
@@ -215,6 +223,9 @@ class ManualSource(ReviewSource):
           "rating_summary": {"average": 4.6, "count": 40, "platform": "Google"},
           "country": "US",                     # optional ISO code
           "legal": {"impressum": "...", "privacy": "https://..."},  # optional
+          "leads": {"endpoint": "https://...", "email": "...",
+                    "callback_windows": ["Morning", "Afternoon", "Evening"]},  # optional
+          "booking": {"provider": "calcom", "url": "https://cal.com/..."},  # optional
           "logo": {"src": "assets/logo.png", "alt": "..."},   # optional
           "photos": [                          # optional but PREFERRED
             {"src": "photos/roof-1.jpg",
