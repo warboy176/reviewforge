@@ -1,7 +1,8 @@
 """Renderer: SiteContent -> a clean, dependency-light static site.
 
 Output is semantic HTML5 + one hand-written CSS file. No frameworks, no
-JavaScript, no trackers, no analytics, no external fonts or CDNs. Mobile-first,
+JavaScript (except the optional, self-hosted lead widget), no trackers, no
+analytics, no external fonts or CDNs. Mobile-first,
 accessible (landmarks, good contrast, alt text, focus styles, tel: links).
 
 Imagery rules enforced here, not just documented:
@@ -27,6 +28,7 @@ from reviewforge.generator import (
     shown_rating_average,
 )
 from reviewforge.models import SiteImage
+from reviewforge.chat_render import render_chat_block, render_lead_form, write_chat_assets
 
 STYLE_CSS = """\
 /* ReviewForge - clean, dependency-light, accessible. No external assets. */
@@ -587,6 +589,16 @@ def render_html(content: SiteContent) -> str:
     # Machine-readable provenance, embedded for auditability.
     prov = provenance_json(content).replace("</", "<\\/")
 
+    # Optional lead-capture widget: ONE self-contained block before </body>,
+    # plus a no-JS form in the contact section. Both are empty strings unless
+    # business.json has a "leads" block.
+    chat_block = render_chat_block(content)
+    lead_form = render_lead_form(content)
+    lead_form_html = (
+        f'        <div class="lead-form-wrap">\n{lead_form}        </div>\n'
+        if lead_form else ""
+    )
+
     title = f"{b.name} — {b.category} in {b.city}"
     meta_desc = _esc(content.hero_subhead[:160])
 
@@ -648,7 +660,7 @@ def render_html(content: SiteContent) -> str:
 {contact_rows}
           </dl>
         </div>
-      </div>
+{lead_form_html}      </div>
     </section>
   </main>
 
@@ -659,7 +671,7 @@ def render_html(content: SiteContent) -> str:
       <p>Site built with ReviewForge. Testimonials are reproduced verbatim from reviews supplied by {_esc(b.name)}.</p>
 {disclosure_html}{legal_section}    </div>
   </footer>
-</body>
+{chat_block}</body>
 </html>
 """
 
@@ -670,6 +682,8 @@ def write_site(content: SiteContent, out_dir: str) -> dict:
     Image assets are written during content generation (they have to exist
     before the markup can state their pixel dimensions), so this only emits
     the text files.
+
+    chat.js is written only when the business configured leads.
     """
     os.makedirs(out_dir, exist_ok=True)
     index_path = os.path.join(out_dir, "index.html")
@@ -683,4 +697,5 @@ def write_site(content: SiteContent, out_dir: str) -> dict:
     with open(prov_path, "w", encoding="utf-8") as fh:
         fh.write(provenance_json(content))
 
-    return {"index": index_path, "css": css_path, "provenance": prov_path}
+    extra = write_chat_assets(content, out_dir)
+    return {"index": index_path, "css": css_path, "provenance": prov_path, **extra}
