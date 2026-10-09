@@ -116,7 +116,7 @@
     }
   ],
   "image_resolution": {
-    "mode": "auto",
+    "mode": "own-only",
     "logo": "supplied by the business",
     "source": "business-supplied photos",
     "supplied_photo_count": 4

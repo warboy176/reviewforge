@@ -130,7 +130,7 @@
     }
   ],
   "image_resolution": {
-    "mode": "auto",
+    "mode": "own-only",
     "logo": "supplied by the business",
     "source": "business-supplied photos",
     "supplied_photo_count": 4
@@ -290,6 +290,8 @@
           <dd><a href="https://bluelineplumbing.example">https://bluelineplumbing.example</a></dd>
           </dl>
         </div>
+        <div class="lead-form-wrap">
+<form class="rf-lead-form" method="post" action="https://leads.bluelineplumbing.example/lead" accept-charset="utf-8"><h3 id="rf-lead-h">Request a callback</h3><p class="rf-lead-note">This form sends your details to Blue Line Plumbing so it can call you back.</p><label>What do you need help with? <select name="service"><option value="Leak Repair">Leak Repair</option><option value="Whole-House Repipe">Whole-House Repipe</option><option value="Water Heater Replacement">Water Heater Replacement</option><option value="Permit and Inspection">Permit and Inspection</option><option value="Something else">Something else</option></select></label><label>Name <input name="name" autocomplete="name" maxlength="80" required></label><label>Phone <input type="tel" name="phone" autocomplete="tel" required></label><label>Email (optional) <input type="email" name="email" autocomplete="email"></label><label>Best time for a call <select name="callback_window"><option value="Morning">Morning</option><option value="Afternoon">Afternoon</option><option value="Evening">Evening</option></select></label><label>Anything else? (optional) <textarea name="message" maxlength="500" rows="3"></textarea></label><div class="rf-hp" aria-hidden="true"><label>Fax <input name="hp_fax" tabindex="-1" autocomplete="off"></label></div><label class="rf-check"><input type="checkbox" name="consent" value="yes"> I agree that Blue Line Plumbing may use these details to contact me about this request.</label><input type="hidden" name="form" value="nojs"><button type="submit">Send request</button></form>        </div>
       </div>
     </section>
   </main>
@@ -301,5 +303,329 @@
       <p>Site built with ReviewForge. Testimonials are reproduced verbatim from reviews supplied by Blue Line Plumbing.</p>
     </div>
   </footer>
+<style id="rf-chat-css">
+.rfc-launcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  background: var(--brand, #12507b);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 20px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0,0,0,.25);
+  min-height: 48px;
+}
+.rfc-launcher:hover,
+.rfc-launcher:focus-visible {
+  background: var(--brand-dark, #0d3a59);
+}
+.rfc-launcher:focus-visible {
+  outline: 3px solid var(--accent, #e8a13a);
+  outline-offset: 3px;
+}
+.rfc-dialog {
+  position: fixed;
+  right: 20px;
+  bottom: 84px;
+  z-index: 1001;
+  width: min(380px, calc(100vw - 40px));
+  max-height: min(640px, calc(100vh - 110px));
+  display: flex;
+  flex-direction: column;
+  background: var(--bg, #ffffff);
+  color: var(--ink, #1a2230);
+  border: 1px solid var(--border, #d7dee8);
+  border-radius: var(--radius, 12px);
+  box-shadow: 0 12px 40px rgba(0,0,0,.3);
+  overflow: hidden;
+  animation: rfc-in .18s ease-out;
+}
+.rfc-dialog[hidden] {
+  display: none;
+}
+@keyframes rfc-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.rfc-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--brand-dark, #0d3a59);
+  color: #fff;
+}
+.rfc-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #fff;
+}
+.rfc-sub {
+  margin: 0;
+  font-size: .8rem;
+  opacity: .9;
+  flex: 1;
+  min-width: 0;
+}
+.rfc-close {
+  margin-left: auto;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.rfc-close:focus-visible {
+  outline: 3px solid var(--accent, #e8a13a);
+}
+.rfc-log {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface, #f5f7fa);
+}
+.rfc-msg {
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 14px;
+  max-width: 88%;
+  font-size: .95rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.rfc-bot {
+  align-self: flex-start;
+  background: var(--bg, #ffffff);
+  border: 1px solid var(--border, #d7dee8);
+}
+.rfc-me {
+  align-self: flex-end;
+  background: var(--brand, #12507b);
+  color: #fff;
+}
+.rfc-step {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border, #d7dee8);
+  background: var(--bg, #ffffff);
+}
+.rfc-step label {
+  font-size: .9rem;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rfc-step input[type=text],
+.rfc-step input[type=tel],
+.rfc-step input[type=email],
+.rfc-step textarea {
+  font: inherit;
+  font-size: 1rem;
+  padding: 10px;
+  border: 1px solid var(--border, #d7dee8);
+  border-radius: 8px;
+  background: var(--bg, #ffffff);
+  color: var(--ink, #1a2230);
+  width: 100%;
+}
+.rfc-step input[type=text][aria-invalid="true"],
+.rfc-step input[type=tel][aria-invalid="true"],
+.rfc-step input[type=email][aria-invalid="true"] {
+  border-color: #b3261e;
+}
+.rfc-step input[type=checkbox] {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.rfc-check {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  font-weight: 400;
+}
+.rfc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rfc-chip {
+  background: var(--bg, #ffffff);
+  color: var(--brand-dark, #0d3a59);
+  border: 2px solid var(--brand, #12507b);
+  border-radius: 999px;
+  padding: 8px 14px;
+  min-height: 44px;
+  font: inherit;
+  font-size: .95rem;
+  cursor: pointer;
+}
+.rfc-chip:hover,
+.rfc-chip:focus-visible {
+  background: var(--brand, #12507b);
+  color: #fff;
+}
+.rfc-primary {
+  display: inline-block;
+  text-align: center;
+  background: var(--accent, #e8a13a);
+  color: #2a1c00;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  min-height: 44px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+.rfc-primary:disabled {
+  opacity: .6;
+  cursor: progress;
+}
+.rfc-err {
+  margin: 0;
+  color: #b3261e;
+  font-size: .9rem;
+  font-weight: 600;
+}
+.rfc-summary {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  font-size: .95rem;
+}
+.rfc-summary dt {
+  font-weight: 700;
+}
+.rfc-summary dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.rfc-tel {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: .9rem;
+  border-top: 1px solid var(--border, #d7dee8);
+  background: var(--bg, #ffffff);
+  color: var(--muted, #55617a);
+}
+.rfc-tel a {
+  font-weight: 700;
+  color: var(--brand-dark, #0d3a59);
+}
+.rfc-hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.rfc-dialog :focus-visible {
+  outline: 3px solid var(--accent, #e8a13a);
+  outline-offset: 2px;
+}
+@media (max-width: 640px) {
+  .rfc-dialog {
+    inset: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: none;
+    height: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    border: 0;
+  }
+  .rfc-launcher {
+    right: 12px;
+    bottom: 12px;
+  }
+  html.rfc-open,
+  html.rfc-open body {
+    overflow: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rfc-dialog {
+    animation: none;
+  }
+  .rfc-launcher,
+  .rfc-chip {
+    transition: none;
+  }
+}
+@media print {
+  .rfc-launcher,
+  .rfc-dialog {
+    display: none !important;
+  }
+}
+.rf-lead-form {
+  padding: 20px;
+  border: 1px solid var(--border, #d7dee8);
+  border-radius: var(--radius, 12px);
+  background: var(--bg, #fff);
+}
+.rf-lead-form label {
+  display: block;
+  font-weight: 600;
+  margin-top: 10px;
+}
+.rf-lead-form input,
+.rf-lead-form select,
+.rf-lead-form textarea {
+  width: 100%;
+  font: inherit;
+  padding: 10px;
+  border: 1px solid var(--border, #d7dee8);
+  border-radius: 8px;
+}
+.rf-lead-form .rf-check {
+  display: flex;
+  gap: 8px;
+  font-weight: 400;
+}
+.rf-lead-form .rf-hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.rf-lead-form button {
+  background: var(--accent, #e8a13a);
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-weight: 700;
+  margin-top: 14px;
+  cursor: pointer;
+}
+.rf-lead-note {
+  font-size: small;
+  color: var(--muted, #55617a);
+}
+
+</style>
+<script type="application/json" id="rf-chat-config">{"business": "Blue Line Plumbing", "phone": "(208) 555-0199", "tel": "tel:2085550199", "services": ["Leak Repair", "Whole-House Repipe", "Water Heater Replacement", "Permit and Inspection"], "endpoint": "https://leads.bluelineplumbing.example/lead", "email": "office@bluelineplumbing.example", "callback_windows": ["Morning", "Afternoon", "Evening"], "booking": {"provider": "calcom", "url": "https://cal.com/blue-line-plumbing-example", "label": "Cal.com"}, "consent_required": false, "privacy_url": null, "min_seconds": 3}</script>
+<script src="chat.js" defer></script>
 </body>
 </html>

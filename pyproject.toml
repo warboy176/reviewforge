@@ -22,5 +22,8 @@ reviewforge = "reviewforge.cli:main"
 [tool.setuptools]
 packages = ["reviewforge"]
 
+[tool.setuptools.package-data]
+reviewforge = ["assets/*.js", "assets/*.css"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -10,7 +10,8 @@
     "domain). The photos are openly licensed stand-ins from Wikimedia Commons",
     "(public domain / CC0), credited in 'attribution' and in the README. They are",
     "not photographs of this (non-existent) business's work. For a real build,",
-    "point 'src' at the business's own image files."
+    "point 'src' at the business's own image files.",
+    "The leads endpoint and the cal.com booking link are fictional placeholders too."
   ],
   "name": "Blue Line Plumbing",
   "category": "Plumber",
@@ -20,6 +21,15 @@
   "hours": "Mon-Fri 7am-5pm, 24/7 emergency call-out",
   "country": "US",
   "offers_free_estimates": false,
+  "leads": {
+    "endpoint": "https://leads.bluelineplumbing.example/lead",
+    "email": "office@bluelineplumbing.example",
+    "callback_windows": ["Morning", "Afternoon", "Evening"]
+  },
+  "booking": {
+    "provider": "calcom",
+    "url": "https://cal.com/blue-line-plumbing-example"
+  },
   "rating_summary": {
     "average": 4.8,
     "count": 37,

@@ -199,7 +199,100 @@ Privacy** elsewhere.
 - ReviewForge writes no legal text for you and gives no legal advice. Also note
   that a static page with no forms, cookies, fonts or third-party scripts — which
   is what ReviewForge emits — keeps the privacy policy simple, but your hosting
-  provider's access logs still count.
+  provider's access logs still count. If you enable the optional lead widget, the page does collect personal data; see [Lead capture and booking](#lead-capture-and-booking-optional).
+
+## Lead capture and booking (optional)
+
+With a `leads` block in `business.json`, the page gets a small self-contained chat widget (`chat.js`, vanilla JS, no dependencies, no CDN, no cookies, no trackers, under 15 KB) behind a floating "Request a callback" button, plus a plain no-JavaScript form in the contact section that posts to the same place. Without `leads`, nothing changes: no script, no form.
+
+The JSON for the `leads` block is:
+
+```json
+{
+  "endpoint": "https://leads.example.com/lead",
+  "email": "office@example.com",
+  "callback_windows": ["Morning", "Afternoon", "Evening"]
+}
+```
+
+And the rules:
+- `endpoint` must be https (http only for 127.0.0.1/localhost testing) and receives a JSON POST;
+- `email` is the mailto fallback;
+- at least one of the two is required;
+- `callback_windows` default to Morning/Afternoon/Evening (max 6).
+
+The `booking` block is optional, needs `leads`, and has:
+- `provider`: `calcom`, `google` or `calendly`;
+- `url`: must be https and on the provider's own domain (cal.com, calendly.com, calendar.app.google / calendar.google.com) -- a self-hosted cal.com needs `"self_hosted": true`.
+
+The conversation proceeds as follows:
+1. Service (the page's service titles + "Something else")
+2. Name
+3. Phone (required)
+4. Email (optional)
+5. "Call me back" with a time window or "Book a time"
+6. Consent checkbox
+7. Summary
+8. Send
+
+Honesty: the widget's header says "Automated assistant" (EU AI Act Art. 50 transparency) and it never claims to be a person. Its text is fixed; it never states prices, availability, response times or anything not in business.json. The confirmation is neutral: "Thanks, <business> has your request." Booking slots come only from the provider's page; ReviewForge never shows or invents availability.
+
+"Book a time" opens the provider page in a new tab, prefilled where the provider supports it (cal.com: name, email, notes; Calendly: name, email; Google appointment schedules: no prefill). The request is also sent as a lead.
+
+Delivery:
+- A fetch() POST of JSON with the fields `name`, `phone`, `email`, `service`, `callback_window`, `booking_provider`, `message`, `consent`, `page_url`, `ts` (plus a honeypot field and the time taken, used for spam filtering);
+- If the POST fails and an email is configured, a prefilled mailto: link is offered;
+- The phone (tel:) link is always shown.
+
+Accessibility:
+- Keyboard reachable launcher
+- role="dialog" with focus trap
+- Esc closes
+- aria-live transcript
+- respects prefers-reduced-motion
+- full-height sheet on phones
+- themed only through the page's CSS custom properties (--brand, --brand-dark, --accent, --bg, --surface, --ink, --muted, --border, --radius)
+
+### Receiving leads: reviewforge serve-leads
+
+```bash
+reviewforge serve-leads --origin https://www.example.com --db leads.sqlite3 --require-consent
+reviewforge serve-leads --db leads.sqlite3 --export-csv leads.csv
+```
+
+The `serve-leads` receiver:
+- Uses only the standard library;
+- Binds 127.0.0.1:8787 by default (put it behind your TLS reverse proxy at the `endpoint` URL);
+- Accepts JSON and the no-JS form;
+- CORS allowlist of the site origin(s) via --origin;
+- Per-IP rate limit (default 5 per 10 minutes);
+- Honeypot and too-fast submissions are silently dropped;
+- Requests over 8 KB are refused;
+- Leads go into a SQLite file;
+- `--export-csv` writes them out;
+- Optional email notification through SMTP configured only by environment variables (REVIEWFORGE_SMTP_HOST, _PORT, _USER, _PASSWORD, _FROM, _TO, _STARTTLS) -- credentials are never written to disk or logged.
+
+Any other endpoint that accepts the same JSON works too (a form backend, your own server).
+
+### Privacy
+
+What is collected:
+- Only what the visitor types: name, phone, optional email, the service picked, callback window or booking choice, an optional message, the consent answer, the page URL and a timestamp.
+
+Where it goes:
+- Only to the endpoint and/or email address in business.json -- ReviewForge itself receives nothing;
+- The booking provider receives only what is prefilled into its URL once the visitor opens it, under the provider's own privacy terms.
+
+The `serve-leads` receiver stores no IP addresses:
+- IPs are held in memory only for rate limiting;
+- The BUSINESS is the data controller and must mention the form, the receiver/host and the booking provider in its privacy policy, decide how long to keep leads, and delete them on request;
+
+Consent rule:
+- The checkbox is always shown;
+- It links the privacy policy when there is one;
+- It is REQUIRED when country is "DE" or a privacy policy is supplied (use --require-consent on the receiver for such sites).
+
+No legal advice.
 
 ## Before you publish
 
@@ -298,7 +391,9 @@ sent automatically (otherwise it returns empty output).
     { "author": "Marcus D.", "rating": 5, "text": "...",
       "date": "March 2026",                      // optional
       "source_url": "https://..." }              // optional, kept in provenance
-  ]
+  ],
+  "leads": { "endpoint": "https://...", "email": "office@..." },  // optional
+  "booking": { "provider": "calcom", "url": "https://cal.com/..." }, // optional
 }
 ```
 
@@ -312,10 +407,11 @@ invented; a malformed review, rating summary or photo entry is rejected loudly.
 
 ### Output
 
-- `index.html` — semantic, responsive, no JavaScript, no trackers, no external
+- `index.html` — semantic, responsive, no JavaScript (unless the optional lead widget is enabled), no trackers, no external
   fonts or CDNs; skip link, landmarks, `tel:` links, focus styles, dark mode.
   The `provenance.json` record is embedded too.
 - `style.css` — one hand-written stylesheet.
+- `chat.js` — only when `leads` is configured: the self-contained lead widget (its CSS is inlined in `index.html`).
 - `images/` — staged copies of supplied photos and/or generated placeholders,
   metadata stripped.
 - `provenance.json` — copy source and every attempt, rejected claims, which
@@ -333,7 +429,7 @@ Both sample businesses are **fictional** — invented names, made-up reviews,
   footer discloses the generated imagery). No `rating_summary`, so the hero
   shows the average of the reviews shown.
 - `samples/business-with-photos.json` → `out-photos/`: **Blue Line Plumbing**,
-  the supplied-photos path (hero, gallery, logo, captions, a `rating_summary`).
+  the supplied-photos path (hero, gallery, logo, captions, a `rating_summary`), plus a `leads` block and a placeholder cal.com `booking` link to show the chat widget.
   Its photos are **openly licensed stand-ins from Wikimedia Commons**, not
   photographs of any plumber's work, and each is credited on the page:
 
@@ -366,6 +462,8 @@ exclusion, caption stripping, unforgeable `is_business_own`); the ComfyUI
 backend's failure modes against a local fake server; and a check that no
 Places / key-in-URL code remains. `tests/conftest.py` points the image backend
 at an unroutable address so no test can start a real GPU render.
+
+The lead widget is covered too: config validation, booking-URL prefill parity between the Python and JavaScript implementations (run with node when it is installed), the widget appearing only when `leads` is set, the "Automated assistant" label, the consent rule, and the `serve-leads` receiver (valid input, honeypot, rate limit, size cap and CORS) on an ephemeral local port.
 
 ## License
 
