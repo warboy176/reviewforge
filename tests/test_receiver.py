@@ -22,8 +22,12 @@ from reviewforge.receiver import (
 
 def make_server(**overrides):
     """Create a test server with ephemeral port."""
+    import tempfile
+    default_db = overrides.pop("db_path", None)
+    if default_db is None:
+        fd, default_db = tempfile.mkstemp(suffix=".sqlite3"); os.close(fd)
     cfg = ReceiverConfig(
-        db_path=str(overrides.pop("db_path", Path("test.sqlite3"))),
+        db_path=str(default_db),
         allowed_origins=["https://bluelineplumbing.example"],
         rate_limit=3,
         rate_window=60,

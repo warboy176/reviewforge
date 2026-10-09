@@ -8,3 +8,6 @@ dist/
 .venv/
 venv/
 # The sample builds (out/, out-photos/) are committed on purpose as proof.
+
+# ephemeral lead databases written by the receiver / its tests
+*.sqlite3
