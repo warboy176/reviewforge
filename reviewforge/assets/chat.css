@@ -4,7 +4,7 @@
   bottom: 20px;
   z-index: 1000;
   background: var(--brand, #12507b);
-  color: #fff;
+  color: var(--brand-ink, #fff);
   border: 0;
   border-radius: 999px;
   padding: 14px 20px;
@@ -47,29 +47,35 @@
   to { opacity: 1; transform: none; }
 }
 .rfc-head {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
+  column-gap: 10px;
   padding: 12px 14px;
   background: var(--brand-dark, #0d3a59);
-  color: #fff;
+  color: var(--brand-ink, #fff);
 }
 .rfc-title {
+  grid-column: 1;
   margin: 0;
   font-size: 1rem;
-  color: #fff;
+  color: var(--brand-ink, #fff);
 }
 .rfc-sub {
   margin: 0;
   font-size: .8rem;
   opacity: .9;
-  flex: 1;
+  grid-column: 1;
   min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rfc-close {
-  margin-left: auto;
+  grid-column: 2;
+  grid-row: 1 / span 2;
   background: transparent;
-  color: #fff;
+  color: var(--brand-ink, #fff);
   border: 0;
   font-size: 1.5rem;
   line-height: 1;
@@ -107,7 +113,7 @@
 .rfc-me {
   align-self: flex-end;
   background: var(--brand, #12507b);
-  color: #fff;
+  color: var(--brand-ink, #fff);
 }
 .rfc-step {
   padding: 12px 14px;
@@ -173,13 +179,13 @@
 .rfc-chip:hover,
 .rfc-chip:focus-visible {
   background: var(--brand, #12507b);
-  color: #fff;
+  color: var(--brand-ink, #fff);
 }
 .rfc-primary {
   display: inline-block;
   text-align: center;
   background: var(--accent, #e8a13a);
-  color: #2a1c00;
+  color: var(--accent-ink, #2a1c00);
   border: 0;
   border-radius: 999px;
   padding: 12px 18px;

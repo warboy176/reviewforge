@@ -1,5 +1,9 @@
 """Renderer: SiteContent -> a clean, dependency-light static site.
 
+Two designs share the rules below: "astra" (the default, rendered by
+reviewforge.astra_render, themed by reviewforge.themes) and "classic" (the
+original design, rendered here; select it with ``theme="classic"``).
+
 Output is semantic HTML5 + one hand-written CSS file. No frameworks, no
 JavaScript (except the optional, self-hosted lead widget), no trackers, no
 analytics, no external fonts or CDNs. Mobile-first,
@@ -29,6 +33,7 @@ from reviewforge.generator import (
 )
 from reviewforge.models import SiteImage
 from reviewforge.chat_render import render_chat_block, render_lead_form, write_chat_assets
+from reviewforge.themes import DEFAULT_PALETTE, DEFAULT_THEME, THEMES, render_astra_css
 
 STYLE_CSS = """\
 /* ReviewForge - clean, dependency-light, accessible. No external assets. */
@@ -399,11 +404,39 @@ def _legal_parts(b) -> tuple[list[str], str]:
     return links, section
 
 
-def render_css() -> str:
-    return STYLE_CSS
+def _check_theme(theme: str) -> str:
+    name = (theme or "").strip().lower()
+    if name not in THEMES:
+        raise ValueError(f"unknown theme {theme!r}; choose one of: {', '.join(THEMES)}")
+    return name
 
 
-def render_html(content: SiteContent) -> str:
+def render_css(content: SiteContent | None = None, theme: str = DEFAULT_THEME) -> str:
+    """The stylesheet for ``theme``.
+
+    Astra (the default) is the Astra stylesheet plus the business's trade
+    palette as CSS custom properties: picked from the category, or from the
+    optional business.json "palette" override. Classic is STYLE_CSS.
+    """
+    if _check_theme(theme) == "classic":
+        return STYLE_CSS
+    from reviewforge.astra_render import astra_palette
+
+    palette = astra_palette(content) if content is not None else DEFAULT_PALETTE
+    return render_astra_css(palette)
+
+
+def render_html(content: SiteContent, theme: str = DEFAULT_THEME) -> str:
+    """Render the page. ``theme`` is "astra" (default) or "classic"."""
+    if _check_theme(theme) == "classic":
+        return _render_classic_html(content)
+    from reviewforge.astra_render import render_astra_html
+
+    return render_astra_html(content)
+
+
+def _render_classic_html(content: SiteContent) -> str:
+    """The classic (pre-Astra) design, kept selectable with --theme classic."""
     b = content.business
     tel = _tel_href(b.phone)
     iset = content.images
@@ -676,7 +709,7 @@ def render_html(content: SiteContent) -> str:
 """
 
 
-def write_site(content: SiteContent, out_dir: str) -> dict:
+def write_site(content: SiteContent, out_dir: str, theme: str = DEFAULT_THEME) -> dict:
     """Write index.html, style.css and provenance.json to out_dir.
 
     Image assets are written during content generation (they have to exist
@@ -691,9 +724,9 @@ def write_site(content: SiteContent, out_dir: str) -> dict:
     prov_path = os.path.join(out_dir, "provenance.json")
 
     with open(index_path, "w", encoding="utf-8") as fh:
-        fh.write(render_html(content))
+        fh.write(render_html(content, theme))
     with open(css_path, "w", encoding="utf-8") as fh:
-        fh.write(render_css())
+        fh.write(render_css(content, theme))
     with open(prov_path, "w", encoding="utf-8") as fh:
         fh.write(provenance_json(content))
 

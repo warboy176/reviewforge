@@ -415,7 +415,7 @@ def test_no_logo_means_typographic_wordmark_not_a_generated_mark(tmp_path):
     content = generate_site_content(b, endpoint=OFFLINE_ENDPOINT, timeout=2.0)
     assert content.images.logo is None
     assert "never generates a logo" in content.provenance["image_resolution"]["logo"]
-    doc = render_html(content)
+    doc = render_html(content, theme="classic")
     assert 'class="brand wordmark"' in doc
     assert "<span class=\"mono\" aria-hidden=\"true\">SR</span>" in doc
 

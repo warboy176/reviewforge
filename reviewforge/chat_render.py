@@ -50,6 +50,12 @@ LEAD_FORM_CSS = """\
   gap: 8px;
   font-weight: 400;
 }
+.rf-lead-form .rf-check input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 3px;
+}
 .rf-lead-form .rf-hp {
   position: absolute;
   left: -10000px;

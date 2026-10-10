@@ -185,7 +185,7 @@ def test_illustrative_images_are_flagged_and_disclosed_in_footer():
 
 
 def test_imageless_card_next_to_imaged_cards_gets_a_panel_not_a_gap():
-    body = _body(render_html(_illustrative_content()))
+    body = _body(render_html(_illustrative_content(), theme="classic"))
     assert body.count('class="card-media blank"') == 1
 
 

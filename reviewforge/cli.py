@@ -31,6 +31,7 @@ from reviewforge import receiver as receiver_mod
 from reviewforge.generator import ImageConfig, generate_site_content
 from reviewforge.models import LegalRequirementError
 from reviewforge.renderer import write_site
+from reviewforge.themes import DEFAULT_THEME, THEMES
 from reviewforge.sources import ManualSource
 
 
@@ -133,7 +134,13 @@ def _cmd_build(args: argparse.Namespace) -> int:
         print(f"  stripped ownership-claiming text from illustrative image "
               f"{img.src}: {img.rejected_caption or img.rejected_alt!r}")
 
-    paths = write_site(content, args.out)
+    paths = write_site(content, args.out, theme=args.theme)
+    if args.theme == "astra":
+        from reviewforge.astra_render import astra_palette
+
+        print(f"Design: astra, palette '{astra_palette(content)}'")
+    else:
+        print(f"Design: {args.theme}")
     print("REVIEW BEFORE PUBLISHING: the copy is machine-drafted. Read every "
           "line against the facts (see the pre-launch checklist in the README).")
     print("Wrote:")
@@ -236,6 +243,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_build.add_argument("--endpoint", **common_llm["endpoint"])
     p_build.add_argument("--timeout", type=float, default=llm.DEFAULT_TIMEOUT,
                          help="LLM request timeout in seconds")
+    p_build.add_argument("--theme", choices=THEMES, default=DEFAULT_THEME,
+                         help="page design: astra (default) or classic")
     _add_image_args(p_build)
     p_build.set_defaults(func=_cmd_build)
 
