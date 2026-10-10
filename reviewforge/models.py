@@ -263,6 +263,9 @@ class Business:
     leads: Optional[LeadsConfig] = None
     #: Optional third-party booking page (cal.com / Google / Calendly).
     booking: Optional[BookingConfig] = None
+    #: Optional colour palette for the default (Astra) design, one of
+    #: reviewforge.themes.PALETTES. None means: pick it from the category.
+    palette: Optional[str] = None
 
     @property
     def rating_average(self) -> Optional[float]:

@@ -30,6 +30,7 @@ from reviewforge.models import (
     SiteImage,
 )
 from reviewforge.leads import parse_booking, parse_leads
+from reviewforge.themes import normalize_palette
 
 _COUNTRY_ALIASES = {
     "GERMANY": "DE", "DEUTSCHLAND": "DE", "USA": "US",
@@ -199,6 +200,7 @@ def _business_from_dict(data: dict[str, Any]) -> Business:
         legal=_legal(data.get("legal")),
         leads=parse_leads(data.get("leads")),
         booking=parse_booking(data.get("booking")),
+        palette=normalize_palette(data.get("palette")),
     )
     if business.booking is not None and business.leads is None:
         raise ValueError(
