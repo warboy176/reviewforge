@@ -317,6 +317,32 @@ live.** A short checklist:
    account (or at least have the login), so the site is not held hostage by
    whoever built it. The output is plain static files; any static host works.
 
+## Design
+
+The default design (`--theme astra`) is an editorial one-page layout: a large
+brand-colour hero panel (paired with the business's photo when it has one, a
+spacious typographic hero when it does not), service cards, a gallery of the
+business's own photos only, full verbatim reviews with a numeric average and
+its stated basis, an about block, a contact panel and, on phones, a fixed call
+bar. System fonts only; no JavaScript unless the lead widget is enabled.
+
+Colours are CSS custom properties. The palette is picked from the business
+category:
+
+| Palette | Picked for categories mentioning |
+|---|---|
+| `roofing` (terracotta and limestone) | roof, gutter, shingle, Dachdecker |
+| `plumbing` (deep teal and mineral) | plumb, drain, sewer, water heater, heating, HVAC, Sanitär |
+| `electrical` (bronze and soft voltage yellow) | electric, solar, lighting, Elektriker |
+| `landscaping` (forest and pale leaf) | landscaping, lawn, garden, tree, yard |
+| `cleaning` (slate blue and porcelain) | cleaning, maid, janitorial, pressure washing, carpet, Reinigung |
+| `auto` (oxblood plum and warm alloy) | auto, car, mechanic, tire, collision, Kfz |
+
+Anything else gets the neutral `cleaning` palette. Set `"palette"` in
+`business.json` to choose one explicitly. Every listed text/background pair
+meets WCAG AA (4.5:1). The original design is still available with
+`--theme classic`.
+
 ## Install
 
 Pure standard library at runtime — no third-party dependencies. Python 3.10+.
@@ -349,6 +375,7 @@ reviewforge check
 | `--model` | `qwen2.5-coder:32b` | Ollama model for copy generation |
 | `--endpoint` | `http://localhost:11434` | Ollama base URL |
 | `--timeout` | `120` | LLM request timeout (seconds) |
+| `--theme` | `astra` | page design: `astra` \| `classic` (see [Design](#design)) |
 | `--images` | `auto` | `auto` \| `own-only` \| `illustrative` \| `off` |
 | `--image-backend` | `auto` | `auto` \| `comfyui` \| `diffusers` |
 | `--comfyui` | `http://127.0.0.1:8188` | ComfyUI base URL |
@@ -394,6 +421,7 @@ sent automatically (otherwise it returns empty output).
   ],
   "leads": { "endpoint": "https://...", "email": "office@..." },  // optional
   "booking": { "provider": "calcom", "url": "https://cal.com/..." }, // optional
+  "palette": "plumbing",                         // optional design palette override
 }
 ```
 
@@ -408,9 +436,11 @@ invented; a malformed review, rating summary or photo entry is rejected loudly.
 ### Output
 
 - `index.html` — semantic, responsive, no JavaScript (unless the optional lead widget is enabled), no trackers, no external
-  fonts or CDNs; skip link, landmarks, `tel:` links, focus styles, dark mode.
+  fonts or CDNs; skip link, landmarks, `tel:` links, focus styles (the classic
+  theme also has a dark mode).
   The `provenance.json` record is embedded too.
-- `style.css` — one hand-written stylesheet.
+- `style.css` — the Astra stylesheet followed by the business's trade palette
+  as CSS custom properties (or the classic stylesheet with `--theme classic`).
 - `chat.js` — only when `leads` is configured: the self-contained lead widget (its CSS is inlined in `index.html`).
 - `images/` — staged copies of supplied photos and/or generated placeholders,
   metadata stripped.
@@ -464,6 +494,8 @@ Places / key-in-URL code remains. `tests/conftest.py` points the image backend
 at an unroutable address so no test can start a real GPU render.
 
 The lead widget is covered too: config validation, booking-URL prefill parity between the Python and JavaScript implementations (run with node when it is installed), the widget appearing only when `leads` is set, the "Automated assistant" label, the consent rule, and the `serve-leads` receiver (valid input, honeypot, rate limit, size cap and CORS) on an ephemeral local port.
+
+The page designs are covered as well: Astra is the default and classic stays selectable, the category-to-palette mapping and the `palette` override, the palette landing last in `style.css`, the layout's landmarks and their order, and the chat widget sitting inside the new layout.
 
 ## License
 
